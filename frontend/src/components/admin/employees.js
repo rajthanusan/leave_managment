@@ -80,7 +80,7 @@ const confirmDelete = () => {
 
     return (
         <Fragment>
-            <Navbar admin />
+            <Navbar manager />
             <Container className="my-5">
                 <ToastContainer />
                 <h1 className="text-darkblue">Employees</h1> <hr />

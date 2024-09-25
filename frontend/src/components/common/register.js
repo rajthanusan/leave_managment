@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 import Navbar from "./navbar";
 
 const Register = () => {
@@ -14,9 +15,27 @@ const Register = () => {
   const [birthday, setBirthday] = useState(null);
   const [joindate, setJoindate] = useState(null);
   const [name, setName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [contact, setContact] = useState(""); // New state for contact
 
   // validation
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Fetch departments from the backend
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get("http://localhost:8085/api/AllDepartment"); // Replace with your API endpoint
+        setDepartments(response.data); // Assuming response data is an array of department names
+      } catch (error) {
+        console.error("Failed to fetch departments", error);
+        toast.error("Failed to load departments");
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   const validateForm = () => {
     const errors = {};
@@ -42,42 +61,47 @@ const Register = () => {
     if (!password) {
       errors.password = "Password is required";
     }
-    /*else if (password.length < 8) {
-            errors.password = 'Password should be at least 8 characters long';
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
-            errors.password = 'Password should contain at least one uppercase and one lowercase letter';
-        }*/
+
+    if (!contact) {
+      errors.contact = "Contact number is required";
+    }
+
+    if (!department) {
+      errors.department = "Department is required";
+    }
 
     return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted"); // Debugging statement
 
     const errors = validateForm();
     if (Object.keys(errors).length === 0) {
       try {
         const response = await axios.post(
-          "http://localhost:8085/api/register",
+          "http://localhost:8085/api/employeeregister",
           {
             username,
             password,
             birthday,
             joindate,
             name,
+            department, // Include the department in the submission
+            contact, // Include contact in the submission
           }
         );
 
         if (response.status === 201) {
           toast.success("Registration successful");
-          console.log(response.data); // Debugging statement
           // Clear form fields
           setUsername("");
           setPassword("");
           setBirthday(null);
           setJoindate(null);
           setName("");
+          setDepartment("");
+          setContact(""); // Clear contact field
           setValidationErrors({});
         }
       } catch (error) {
@@ -93,9 +117,21 @@ const Register = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <div className="container pt-4">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
+      <div className="container pt-5">
+        <div className="row row-grid align-items-center">
+          {/* Image Section */}
+          <div className="col-12 col-md-5 col-lg-6 text-center">
+            <figure className="w-100">
+              <img
+                src="https://imconnect.in/wp-content/uploads/2024/04/imconnect-employee-location-tracking-app.gif"
+                alt="Leave Management"
+                className="img-fluid mw-md-120"
+              />
+            </figure>
+          </div>
+
+          {/* Form Section */}
+          <div className="col-12 col-md-7 col-lg-6">
             <Card className="shadow-lg registration-card">
               <h1 className="text-center mb-4" style={{ color: "darkblue" }}>
                 Register
@@ -121,6 +157,26 @@ const Register = () => {
                   </div>
                 </div>
                 <br />
+
+                {/* New Contact Field */}
+                <div>
+                  <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                      <i className="pi pi-phone"></i>
+                    </span>
+                    <InputText
+                      value={contact}
+                      onChange={(e) => setContact(e.target.value)}
+                      className={validationErrors.contact ? "p-invalid" : ""}
+                      placeholder="Contact Number"
+                    />
+                  </div>
+                  {validationErrors.contact && (
+                    <small className="p-error">{validationErrors.contact}</small>
+                  )}
+                </div>
+                <br />
+
                 <div className="row mb-3">
                   <div className="col">
                     <span className="p-float-label">
@@ -164,6 +220,24 @@ const Register = () => {
                   </div>
                 </div>
 
+                {/* Department Dropdown */}
+                <div>
+                  <Dropdown
+                    value={department}
+                    options={departments}
+                    onChange={(e) => setDepartment(e.value)}
+                    placeholder="Select Department"
+                    className={validationErrors.department ? "p-invalid" : ""}
+                  />
+                  {validationErrors.department && (
+                    <small className="p-error">
+                      {validationErrors.department}
+                    </small>
+                  )}
+                </div>
+
+                <br />
+
                 <div>
                   <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
@@ -201,25 +275,15 @@ const Register = () => {
                       placeholder="Password"
                     />
                   </div>
-                  <div>
-                    {validationErrors.password && (
-                      <small className="p-error">
-                        {validationErrors.password}
-                      </small>
-                    )}
-                  </div>
+                  {validationErrors.password && (
+                    <small className="p-error">
+                      {validationErrors.password}
+                    </small>
+                  )}
                 </div>
                 <br />
-                <Button
-                  type="submit"
-                  label="Register"
-                  className="p-button-primary w-100 custom-darkblue-button"
-                  style={{
-                    backgroundColor: "darkblue",
-                    borderColor: "darkblue",
-                    color: "white",
-                  }}
-                />
+
+                <Button type="submit" label="Register" className="p-button-primary custom-darkblue-button" />
               </form>
             </Card>
           </div>

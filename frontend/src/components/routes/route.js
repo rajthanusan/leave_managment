@@ -1,67 +1,85 @@
-import React from 'react'
-
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../common/home';
 import Login from '../common/login';
 import Register from '../common/register';
 import ApplyLeave from '../user/applyLeave';
 import MyLeave from '../user/myleave';
-import Employees from '../admin/employees';
 import Leavetype from '../admin/leavetype';
-import Leaverequest from '../admin/leaverequest';
-import { Navigate } from 'react-router-dom';
+import Manager from '../admin/manager';
+import Leaverequest from '../manager/leaverequest';
+import Employees from '../manager/employees';
+import LeaveSummary from '../user/LeaveSummary';
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// Helper component to wrap Employees and pass the username
+const EmployeesWithProps = () => {
+    const loggedInDepartmentManager = JSON.parse(sessionStorage.getItem('loggedInDepartmentManager'));
+    const username = loggedInDepartmentManager ? loggedInDepartmentManager.username : '';
+    return <Employees username={username} />;
+};
 
 export default function Routesnav() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     const loggedInAdmin = JSON.parse(sessionStorage.getItem('loggedInAdmin'));
+    const loggedInDepartmentManager = JSON.parse(sessionStorage.getItem('loggedInDepartmentManager'));
+
     return (
-        <>
-            <Router>
-                {/* home navigation routes */}
-                <Routes>
-                    <Route
-                        path="/homeadmin"
-                        element={loggedInAdmin ? <Home admin /> : <Navigate to="/login" />}
-                    />
-                    <Route
-                        path="/homeuser"
-                        element={loggedInUser ? <Home user /> : <Navigate to="/login" />}
-                    />
+        <Router>
+            <Routes>
+                {/* Home navigation routes */}
+                <Route
+                    path="/homeadmin"
+                    element={loggedInAdmin ? <Home admin /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/homeuser"
+                    element={loggedInUser ? <Home user /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/homedepartmentmanager"
+                    element={loggedInDepartmentManager ? <Home departmentManager /> : <Navigate to="/login" />}
+                />
 
-                    {/* common pages routes */}
-                    <Route path="/home" element={<Home />} />
-                    <Route path="" element={<Home />} />
+                {/* Common pages routes */}
+                <Route path="/home" element={<Home />} />
+                <Route path="/" element={<Navigate to="/home" />} />
 
-                    {/* login and register routes */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                {/* Login and register routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-                    {/* user pages routes */}
-                    <Route
-                        path="/applyleave"
-                        element={loggedInUser ? <ApplyLeave /> : <Navigate to="/login" />}
-                    />
-                    <Route
-                        path="/myleave"
-                        element={loggedInUser ? <MyLeave /> : <Navigate to="/login" />}
-                    />
+                {/* User pages routes */}
+                <Route
+                    path="/applyleave"
+                    element={loggedInUser ? <ApplyLeave /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/myleave"
+                    element={loggedInUser ? <MyLeave /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/employees"
+                    element={loggedInDepartmentManager ? <EmployeesWithProps /> : <Navigate to="/login" />}
+                />
 
-                    {/* admin pages routes */}
-                    <Route
-                        path="/employees"
-                        element={loggedInAdmin ? <Employees /> : <Navigate to="/login" />}
-                    />
-                    <Route
-                        path="/leavetype"
-                        element={loggedInAdmin ? <Leavetype /> : <Navigate to="/login" />}
-                    />
-                    <Route
-                        path="/leaverequest"
-                        element={loggedInAdmin ? <Leaverequest /> : <Navigate to="/login" />}
-                    />
-                </Routes>
-            </Router>
-        </>
-    )
+                {/* Admin pages routes */}
+                <Route
+                    path="/manager"
+                    element={loggedInAdmin ? <Manager /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/leavetype"
+                    element={loggedInAdmin ? <Leavetype /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/leaverequest"
+                    element={loggedInDepartmentManager ? <Leaverequest /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/leavesummary"
+                    element={loggedInUser ? <LeaveSummary /> : <Navigate to="/login" />}
+                />
+            </Routes>
+        </Router>
+    );
 }

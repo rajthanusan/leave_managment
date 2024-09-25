@@ -5,97 +5,85 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from '../common/navbar'
+import Navbar from '../common/navbar';
 
 const Leavetype = () => {
     const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    //const handleShow = () => setShow(true);
-
-    // Add
-    const [leave, setLeave] = useState('')
-    const [days, setDays] = useState('')
-
-    //Edit
-    const [editID, setEditId] = useState('')
-    const [editLeave, setEditLeave] = useState('')
-    const [editDays, setEditDays] = useState('')
-
+    const [leave, setLeave] = useState('');
+    const [days, setDays] = useState('');
+    const [editID, setEditId] = useState('');
+    const [editLeave, setEditLeave] = useState('');
+    const [editDays, setEditDays] = useState('');
     const [data, setData] = useState([]);
 
     useEffect(() => {
         getData();
-    }, [])
+    }, []);
 
     const getData = () => {
         axios.get('http://localhost:8085/api/Leavetype')
             .then((result) => {
-                setData(result.data)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    const handleEdit = (id) => {
-            setShow(true);
-            setEditId(id); 
-        axios.get(`http://localhost:8085/api/Leavetype/${id}`) // Fixed missing `/`
-            .then((result) => {
-                setEditLeave(result.data.leave_type_name); // Ensure it matches the field returned from the API
-                setEditDays(result.data.days);
-                setEditId(id);
+                setData(result.data);
             })
             .catch((error) => {
                 console.log(error);
             });
     };
-    
+
+    const handleEdit = (id) => {
+        setShow(true);
+        setEditId(id);
+        setEditLeave('');
+        setEditDays('');
+        axios.get(`http://localhost:8085/api/Leavetype/${id}`)
+            .then((result) => {
+                setEditLeave(result.data.leave_type_name);
+                setEditDays(result.data.days);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
     const handleUpdate = () => {
         if (!editID) {
             toast.error('Invalid ID');
             return;
         }
-    
-        const url = `http://localhost:8085/api/Leavetype/${editID}`; // Correct URL for update
+
+        const url = `http://localhost:8085/api/Leavetype/${editID}`;
         const data = {
-            leave_type_name: editLeave, // Ensure it matches the field returned from the API
-            days: editDays
+            leave_type_name: editLeave,
+            days: editDays,
         };
-    
-        console.log("Updating Leave ID:", editID);
-        console.log("URL:", url);
-        console.log("Payload:", data);
-    
+
+        console.log('Updating leave type with data:', data);
+
         axios.put(url, data)
             .then((result) => {
-                toast.success('Leave type has been updated');
-                getData(); // Refresh the data
-                setShow(false); // Close the modal
+                console.log('Update result:', result);
+                toast.success('Leave request has been updated');
+                getData();
+                clear();
+                setShow(false);
             })
             .catch((error) => {
                 console.error('Error during update:', error);
-                console.error('Response:', error.response);
-                toast.error('Leave type updating failed');
+                toast.error('Leave request updating failed');
             });
     };
-    
-
-    
 
     const handleSave = () => {
         const url = 'http://localhost:8085/api/Leavetype';
         const data = {
-
-            "leave": leave,
-            "days": days
-        }
+            leave_type_name: leave,
+            days: days
+        };
         axios.post(url, data)
             .then((result) => {
                 getData();
@@ -103,31 +91,24 @@ const Leavetype = () => {
                 toast.success('Leave type has been added');
             })
             .catch((error) => {
-                toast.error(error);
-            })
-    }
+                toast.error('Failed to add leave type');
+            });
+    };
 
     const clear = () => {
         setLeave('');
         setDays('');
-
         setEditLeave('');
         setEditDays('');
         setEditId('');
-    }
+    };
 
-
-    
-    
     // Pagination
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 3;
-
     const startIndex = currentPage * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-
     const currentItems = data.slice(startIndex, endIndex);
-
     const totalPages = Math.ceil(data.length / itemsPerPage);
 
     const nextPage = () => {
@@ -158,8 +139,8 @@ const Leavetype = () => {
                     }
                 })
                 .catch((error) => {
-                    toast.error(error);
-                })
+                    toast.error('Failed to delete leave type');
+                });
         }
     };
 
@@ -181,7 +162,7 @@ const Leavetype = () => {
                                         <label htmlFor="">No. of days</label>
                                         <input type="number" className="form-control" placeholder="No. of Days" value={days} onChange={(e) => setDays(e.target.value)} required />
                                         <br />
-                                        <button className="btn btn-primary custom-darkblue-button" onClick={() => handleSave()}>Create</button> <br />
+                                        <button className="btn btn-primary custom-darkblue-button" onClick={handleSave}>Create</button> <br />
                                     </div>
                                 </div>
                             </div>
@@ -202,8 +183,8 @@ const Leavetype = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {currentItems.map((item, index) => (
-                                                    <tr key={index}>
+                                                {currentItems.map((item) => (
+                                                    <tr key={item.id}>
                                                         <td>{item.leave_type_name}</td>
                                                         <td>{item.days}</td>
                                                         <td>
@@ -215,65 +196,51 @@ const Leavetype = () => {
                                             </tbody>
                                         </Table>
                                         <div>
-                                            <button className="btn" onClick={prevPage} disabled={currentPage === 0}>
-                                                {"<"}
-                                            </button>
+                                            <button className="btn" onClick={prevPage} disabled={currentPage === 0}>{"<"}</button>
                                             &nbsp;<span>{currentPage + 1} / {totalPages}</span>&nbsp;
-                                            <button className="btn custom-darkblue-button" onClick={nextPage} disabled={currentPage === totalPages - 1}>
-                                                {">"}
-                                            </button>
+                                            <button className="btn custom-darkblue-button" onClick={nextPage} disabled={currentPage === totalPages - 1}>{">"}</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <Modal show={show} onHide={handleClose}>
+                        <Modal show={show} onHide={() => setShow(false)}>
                             <Modal.Header closeButton>
-                                <Modal.Title className="text-darkblu">Update Leave Type</Modal.Title>
+                                <Modal.Title className="text-darkblue">Update Leave Type</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <Row>
                                     <Col>
                                         <label htmlFor="">Leave Type</label>
-                                        <input type="text" className="form-control" placeholder="Leave Type" value={editLeave} onChange={(e) => setEditLeave(e.target.value)}></input>
+                                        <input type="text" className="form-control" placeholder="Leave Type" value={editLeave} onChange={(e) => setEditLeave(e.target.value)} />
                                     </Col>
                                     <Col>
                                         <label htmlFor="">No. of days</label>
-                                        <input type="number" className="form-control" placeholder="No. of Days" value={editDays} onChange={(e) => setEditDays(e.target.value)}></input>
+                                        <input type="number" className="form-control" placeholder="No. of Days" value={editDays} onChange={(e) => setEditDays(e.target.value)} />
                                     </Col>
-
                                 </Row>
                             </Modal.Body>
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={handleClose}>
-                                    Close
-                                </Button>
-                                <Button variant="primary custom-darkblue-button" onClick={handleUpdate}>
-                                    Save
-                                </Button>
+                                <Button variant="secondary" onClick={() => setShow(false)}>Close</Button>
+                                <Button variant="primary custom-darkblue-button" onClick={handleUpdate}>Save Changes</Button>
                             </Modal.Footer>
                         </Modal>
+
                         <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
                             <Modal.Header closeButton>
-                                <Modal.Title className="text-danger">Delete Confirmation</Modal.Title>
+                                <Modal.Title>Delete Confirmation</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body>
-                                Are you sure you want to delete this Leave type?
-                            </Modal.Body>
+                            <Modal.Body>Are you sure you want to delete this leave type?</Modal.Body>
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={handleCloseDeleteModal}>
-                                    Cancel
-                                </Button>
-                                <Button variant="danger" onClick={confirmDelete}>
-                                    Delete
-                                </Button>
+                                <Button variant="secondary" onClick={handleCloseDeleteModal}>Cancel</Button>
+                                <Button variant="danger" onClick={confirmDelete}>Delete</Button>
                             </Modal.Footer>
                         </Modal>
                     </Col>
                 </Row>
             </div>
         </Fragment>
-    )
-}
+    );
+};
 
 export default Leavetype;

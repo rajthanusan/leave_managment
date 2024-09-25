@@ -106,86 +106,106 @@ const ApplyLeave = () => {
             <Navbar user />
             <ToastContainer /> <br />
             <Container>
-                <div className="row justify-content-center">
-                    <div className="col-md-6">
-                        <Card className="p-1 shadow-lg rounded bg-light registration-card px-4">
-                            <h1 className="mb-4 text-darkblue">Apply For Leave</h1> <hr />
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSave();
-                            }}>
-                                <div className="mb-3">
-                                    <label className="form-label">Leave Type</label>
-                                    {additionalData.length > 0 ? (
-                                        <select
-                                            className="form-select"
-                                            value={leave}
-                                            onChange={(e) => setLeave(e.target.value)}
-                                        >
-                                            <option value="">--Select Leave Type--</option>
-                                            {additionalData.map((item) => (
-                                                <option key={item.id} value={item.leave_type_name}>
-                                                    {item.leave_type_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Leave Type"
-                                            value={leave}
-                                            onChange={(e) => setLeave(e.target.value)}
-                                        />
-                                    )}
-                                    {errors.leave && <div className="text-danger">{errors.leave}</div>}
-                                </div>
+            <div className="container pt-5">
+  <div className="row row-grid align-items-center">
+    {/* Image Section */}
+    <div className="col-12 col-md-5 col-lg-6 text-center">
+      <figure className="w-100">
+        <img
+          src="https://media.licdn.com/dms/image/C4D12AQH3moW8i3ewrw/article-cover_image-shrink_600_2000/0/1628589993746?e=2147483647&v=beta&t=x0r-d-0VMlcRA_l3hQGm6RBCel5ZrQrV1KkIE6N167g"
+          alt="Leave Management"
+          className="img-fluid mw-md-120"
+        />
+      </figure>
+    </div>
 
-                                <div className="row mb-3">
-                                    <div className="col">
-                                        <span className="p-float-label">
-                                            <Calendar
-                                                id="startdate"
-                                                value={startdate}
-                                                onChange={(e) => setStartdate(e.target.value)}
-                                                dateFormat="dd/mm/yy"
-                                                showIcon
-                                            />
-                                            <label htmlFor="startdate">Start date</label>
-                                        </span>
-                                        {errors.startdate && <div className="text-danger">{errors.startdate}</div>}
-                                    </div>
-                                    <div className="col">
-                                        <span className="p-float-label">
-                                            <Calendar
-                                                id="enddate"
-                                                value={enddate}
-                                                onChange={(e) => setEnddate(e.target.value)}
-                                                dateFormat="dd/mm/yy"
-                                                showIcon
-                                            />
-                                            <label htmlFor="enddate">End date</label>
-                                        </span>
-                                        {errors.enddate && <div className="text-danger">{errors.enddate}</div>}
-                                    </div>
-                                </div>
+    {/* Form Section */}
+    <div className="col-12 col-md-7 col-lg-6">
+      <Card className="p-3 shadow-lg rounded bg-light registration-card">
+        <h1 className="text-center mb-4 text-darkblue">Apply For Leave</h1>
+        <hr />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
+          <div className="mb-3">
+            <label className="form-label">Leave Type</label>
+            {additionalData.length > 0 ? (
+              <select
+                className="form-select"
+                value={leave}
+                onChange={(e) => setLeave(e.target.value)}
+              >
+                <option value="">--Select Leave Type--</option>
+                {additionalData.map((item) => (
+                  <option key={item.id} value={item.leave_type_name}>
+                    {item.leave_type_name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Leave Type"
+                value={leave}
+                onChange={(e) => setLeave(e.target.value)}
+              />
+            )}
+            {errors.leave && <div className="text-danger">{errors.leave}</div>}
+          </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Request Comments</label>
-                                    <textarea
-                                        className="form-control"
-                                        placeholder="Comments"
-                                        value={comments}
-                                        onChange={(e) => setComments(e.target.value)}
-                                        rows={2}
-                                    />
-                                    {errors.comments && <div className="text-danger">{errors.comments}</div>}
-                                </div>
-                                <button type="submit" className="custom-darkblue-button btn btn-primary " >Create</button>
-                            </form>
-                        </Card>
-                    </div>
-                </div>
+          <div className="row mb-3">
+            <div className="col">
+              <span className="p-float-label">
+                <Calendar
+                  id="startdate"
+                  value={startdate}
+                  onChange={(e) => setStartdate(e.target.value)}
+                  dateFormat="dd/mm/yy"
+                  showIcon
+                />
+                <label htmlFor="startdate">Start date</label>
+              </span>
+              {errors.startdate && <div className="text-danger">{errors.startdate}</div>}
+            </div>
+            <div className="col">
+              <span className="p-float-label">
+                <Calendar
+                  id="enddate"
+                  value={enddate}
+                  onChange={(e) => setEnddate(e.target.value)}
+                  dateFormat="dd/mm/yy"
+                  showIcon
+                />
+                <label htmlFor="enddate">End date</label>
+              </span>
+              {errors.enddate && <div className="text-danger">{errors.enddate}</div>}
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Request Comments</label>
+            <textarea
+              className="form-control"
+              placeholder="Comments"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              rows={2}
+            />
+            {errors.comments && <div className="text-danger">{errors.comments}</div>}
+          </div>
+          <button type="submit" className="custom-darkblue-button btn btn-primary w-100">
+            Create
+          </button>
+        </form>
+      </Card>
+    </div>
+  </div>
+</div>
+
             </Container>
         </Fragment>
     )

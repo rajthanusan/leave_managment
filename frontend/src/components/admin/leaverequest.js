@@ -90,7 +90,7 @@ const Leaverequest = () => {
 
     return (
         <Fragment>
-            <Navbar admin />
+            <Navbar manager />
             <ToastContainer />
             <br />
             <div className="container">

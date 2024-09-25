@@ -20,6 +20,7 @@
   color: white !important;
 }
 
+
 /* Custom CSS for changing the calendar icon box color */
 /* Custom button class */
 .custom-darkblue-button {
@@ -35,6 +36,21 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow */
   color: white !important; /* Ensure text color remains white */
 }
+
+.custom-gold-button {
+  background-color: #d4af37 !important; /* Gold */
+  border: 2px solid #b8860b;
+  color: white;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for custom-gold-button */
+.custom-gold-button:hover {
+  background-color: #e1c16e !important; /* Lighter gold on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow */
+  color: white !important; /* Ensure text color remains white */
+}
+
 
 .p-datepicker-trigger {
   background-color: #004085 !important; /* Dark blue color */
@@ -86,6 +102,15 @@
     color: darkblue !important;
 }
 
+.link-button {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+}
 
 
 /* Add this to your CSS file 

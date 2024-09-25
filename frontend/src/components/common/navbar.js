@@ -12,6 +12,7 @@ export function Nav() {
 
     const end = (
         <>
+        
             <Link to="/login">
                 <Button 
                     label="Login" 
@@ -26,6 +27,7 @@ export function Nav() {
                     icon="pi pi-user-plus" 
                 />
             </Link>
+            
         </>
     );
 
@@ -39,11 +41,16 @@ export function Navuser() {
     const username = loggedInUser ? JSON.parse(loggedInUser).username : '';
 
     const items = [
-        { label: 'Home', icon: 'pi pi-home', url: '/homeuser' },
-        { label: 'Apply for Leave', icon: 'pi pi-calendar-plus', url: '/applyleave' },
-        { label: 'My Leave', icon: 'pi pi-list', url: '/myleave' },
+        
+{ label: 'Home', icon: 'pi pi-home', url: '/homeadmin' },
+        { label: 'Apply Leave', icon: 'pi pi-users', url: '/applyleave' },
+        {
+            label: 'Leave Types', icon: 'pi pi-list', items: [
+                { label: 'My Leave', icon: 'pi pi-calendar-plus', url: '/myleave' },
+                { label: 'Leave Summary', icon: 'pi pi-calendar-plus', url: '/leavesummary' },
+            ]
+        },
     ];
-
     const end = (
         <SplitButton
             label={username}
@@ -67,17 +74,48 @@ export function Navuser() {
     );
 }
 
-export function Navadmin() {
+export function Navmanager({ username }) {
+    // If username is not provided as a prop, fallback to reading from sessionStorage
+    const effectiveUsername = username || (sessionStorage.getItem('loggedInDepartmentManager')
+        ? JSON.parse(sessionStorage.getItem('loggedInDepartmentManager')).username
+        : '');
+
     const items = [
         { label: 'Home', icon: 'pi pi-home', url: '/homeadmin' },
         { label: 'Employees', icon: 'pi pi-users', url: '/employees' },
-        {
-            label: 'Leave Management', icon: 'pi pi-calendar-plus', items: [
-                { label: 'Leave Types', icon: 'pi pi-list', url: '/leavetype' },
-                { label: 'Leave Requests', icon: 'pi pi-calendar-plus', url: '/leaverequest' },
-            ]
-        },
+        { label: 'Leave Requests', icon: 'pi pi-calendar-plus', url: '/leaverequest' },
     ];
+
+    const end = (
+        <SplitButton
+            label={effectiveUsername || 'Manager'}  // Default to 'Manager' if username is empty
+            icon="pi pi-user"
+            className="custom-darkblue-button"
+            model={[{
+                label: 'Logout',
+                icon: 'pi pi-power-off',
+                command: () => {
+                    sessionStorage.removeItem('loggedInDepartmentManager');
+                    window.location.href = '/login';
+                }
+            }]}
+        />
+    );
+
+    return (
+        <Menubar model={items} end={end} className="menu-item" />
+    );
+}
+
+
+
+export function Navadmin() {
+    const items = [
+        { label: 'Home', icon: 'pi pi-home', url: '/homeadmin' },
+        { label: 'Manager', icon: 'pi pi-users', url: '/manager' },
+        {label: 'Leave Types', icon: 'pi pi-list', url: '/leavetype'}
+            ]
+        
 
     const end = (
         <SplitButton
@@ -105,6 +143,9 @@ export function Navadmin() {
 export default function Navbar(props) {
     if (props.user) {
         return <Navuser />;
+    }
+    if (props.manager) {
+        return <Navmanager username={props.username} />;
     }
     if (props.admin) {
         return <Navadmin />;
